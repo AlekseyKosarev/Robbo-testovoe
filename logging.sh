@@ -8,7 +8,7 @@ log() {
     return 1
   fi
 
-  local error_message="$2"
+  local error_message="$1"
   local current_time=$(date +"%Y-%m-%d %H:%M:%S")
 
   {
