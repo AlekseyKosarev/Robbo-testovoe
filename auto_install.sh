@@ -33,7 +33,7 @@ trap cleanup INT TERM
 # передает строку из конфига
 while IFS= read -r line; do
   tmp=$(mktemp)
-  ./install.sh "$line" >"$tmp" 2>$1 $
+  ./install.sh "$line" >"$tmp" 2>&1 &
   pids+=($!)
   tmp_files+=("$tmp")
 done < "$config"
