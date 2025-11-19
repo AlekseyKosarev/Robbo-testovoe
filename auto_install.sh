@@ -52,18 +52,16 @@ rm -f "$log_file"
 while IFS= read -r line; do
   [[ "$line" =~ ^[[:space:]]*# ]] && continue  # пропускаем комментарии
   [[ -z "$line" ]] && continue                # пропускаем пустые строки
-  
+
   tmp=$(mktemp) || { error "Не удалось создать временный файл (mktemp failed)"; exit 1; }
   ./install.sh "$line" >"$tmp" 2>&1 &
   pids+=($!)
   tmp_files+=("$tmp")
-
-  app_names+="${line%% *}"
 done < "$config"
 
 # ждем завершения процессов, а также перехватываем обычый вывод и ошибки в лог файл! 
 for i in "${!pids[@]}"; do
-  debug "${app_names[i]}: установка начата..."
+  debug "установка начата..."
 
   tmp=${tmp_files[i]}
   wait "${pids[i]}"
