@@ -4,7 +4,6 @@
 pids=()
 tmp_files=()
 
-
 cleanup() {
   echo "Прерывание: завершаем дочерние процессы..."
   kill "${pids[@]}" 2>/dev/null
@@ -34,7 +33,7 @@ echo "Список пакетов для установки:"
 cat -bs "$config"
 
 # подтверждение установки y/n
-printf '\n Продолжить установку %d пакет(ов)? (y/N):'
+echo 'Продолжить установку? (y/N):'
 read -r confirm
 case "${confirm,,}" in
   y|yes) echo "Начинаем установку...";;
@@ -47,8 +46,6 @@ esac
 while IFS= read -r line; do
   [[ "$line" =~ ^[[:space:]]*# ]] && continue  # пропускаем комментарии
   [[ -z "$line" ]] && continue                # пропускаем пустые строки
-  
-  echo " - Установка: $line "
   
   tmp=$(mktemp) || { error "Не удалось создать временный файл (mktemp failed)"; exit 1; }
   ./install.sh "$line" >"$tmp" 2>&1 &
@@ -64,11 +61,11 @@ for i in "${!pids[@]}"; do
   output=$(cat "$tmp")
 
   if [ $status -ne 0 ]; then
-    echo " - Произошла ошибка, подробности в $log_file!\n"
+    echo "- Произошла ошибка, подробности в $log_file!\n"
     filtered=$(printf '%s\n' "$output" | grep -v '^DEBUG:' || true)
     log "$filtered"
   else
-    echo " - Пакет успешно установлен!\n"
+    # echo "- Пакет успешно установлен!\n"
     printf '%s\n' "$output" | grep '^DEBUG:'
   fi
 
