@@ -20,21 +20,16 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-if [ ! "$#" -eq 2 ]; then
-  error "Пожалуйста передайте config и log файлы как аргументы! - ./auto_install config.conf log_file.log"
+if [ "$#" -eq 0 ]; then
+  error "Пожалуйста передайте config файл как аргумент!"
   exit 1
 fi
 
 config=$1
-log_file=$2 
+log_file="log_file.log"
 
 if [ ! -r "$config" ]; then
   error "Файл '$config' недоступен или не существует"
-  exit 1
-fi
-
-if [ ! -r "$log_file" ]; then
-  error "Файл '$log_file' недоступен или не существует"
   exit 1
 fi
 
