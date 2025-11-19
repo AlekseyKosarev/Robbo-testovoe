@@ -8,6 +8,22 @@
 wget_timeout=10
 apt_flags=-y
 
+is_installed() {
+  local name="$1"
+  
+  
+  if dpkg -s "$name" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  # Затем проверим, есть ли исполняемый файл (на случай, если пакет называется иначе, или установлен вручную)
+  if command -v "$name" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  return 1
+}
+
 download_package_wget() {
   if wget --spider --timeout=5 "$link" >/dev/null 2>&1; then
     debug "-> Загружаю $app_name..."
@@ -64,6 +80,8 @@ if [ -z "$app_name" ]; then
   exit 1
 fi
 
-if ! install_with_apt; then
+if is_installed "$app_name"; then
+  debug "$app_name: уже установлено, пропуск"
+elif ! install_with_apt; then
   exit 1
 fi
