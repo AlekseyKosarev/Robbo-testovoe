@@ -3,7 +3,8 @@
 # принимает один аргумент - строку из конфига 
 # формат строки - "app_name app_link(необязательно)"
 
-. ./logging.sh
+SCRIPT_DIR="$(dirname "$0")"
+source "$SCRIPT_DIR/logging.sh"
 
 wget_timeout=10
 apt_flags=-y

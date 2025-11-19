@@ -1,10 +1,10 @@
 #!/bin/bash
-. ./logging.sh
+SCRIPT_DIR="$(dirname "$0")"
+source "$SCRIPT_DIR/logging.sh"
 
 
 pids=()
 tmp_files=()
-app_names=()
 
 cleanup() {
   echo "Прерывание: завершаем дочерние процессы..."
@@ -20,14 +20,21 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-if [ "$#" -eq 0 ]; then
-  error "Пожалуйста передайте config файл как аргумент!"
+if [ ! "$#" -eq 2 ]; then
+  error "Пожалуйста передайте config и log файлы как аргументы! - ./auto_install config.conf log_file.log"
   exit 1
 fi
 
 config=$1
+log_file=$2 
+
 if [ ! -r "$config" ]; then
   error "Файл '$config' недоступен или не существует"
+  exit 1
+fi
+
+if [ ! -r "$log_file" ]; then
+  error "Файл '$log_file' недоступен или не существует"
   exit 1
 fi
 
@@ -44,8 +51,7 @@ case "${confirm,,}" in
 esac
 #
 
-# удаление логов перед стартом
-rm -f "$log_file"
+clear_logs "$log_file"
 
 # построчно читает файл - вызывает install.sh
 # передает строку из конфига
@@ -67,9 +73,9 @@ for i in "${!pids[@]}"; do
   output=$(cat "$tmp")
 
   if [ $status -ne 0 ]; then
-    echo " -> Произошла ошибка, подробности в $log_file!"
+    echo " -> Произошла ошибка, подробности в логах!"
     filtered=$(printf '%s\n' "$output" | grep -v '^DEBUG:' || true)
-    log "$filtered"
+    log "$log_file" "$filtered"
   else
     printf '%s\n' "$output" | grep '^DEBUG:'
   fi

@@ -1,15 +1,21 @@
 #!/bin/bash
-log_file="log_file.log" 
 
+# $1 - log_file
+clear_logs() {
+  # удаление логов перед стартом
+  rm -f "$1"
+}
+
+# $1 - log_file, $2 - msg
 log() {
-  local msg="$1" ts
+  local msg="$2" ts
   ts=$(date +"%Y-%m-%d %H:%M:%S")
   {
     echo "--- $ts ---"
     echo "$msg"
     echo "--- ^^^^^^^^^^^^^^^^^ ---"
     echo
-  } >> "$log_file"
+  } >> "$1"
 }
 
 debug() {
