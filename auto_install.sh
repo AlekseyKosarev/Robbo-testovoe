@@ -61,7 +61,7 @@ done < "$config"
 
 # ждем завершения процессов, а также перехватываем обычый вывод и ошибки в лог файл! 
 for i in "${!pids[@]}"; do
-  debug "установка начата..."
+  debug " -> установка начата..."
 
   tmp=${tmp_files[i]}
   wait "${pids[i]}"
@@ -69,11 +69,10 @@ for i in "${!pids[@]}"; do
   output=$(cat "$tmp")
 
   if [ $status -ne 0 ]; then
-    echo "- Произошла ошибка, подробности в $log_file!\n"
+    echo " -> Произошла ошибка, подробности в $log_file!"
     filtered=$(printf '%s\n' "$output" | grep -v '^DEBUG:' || true)
     log "$filtered"
   else
-    # echo "- Пакет успешно установлен!\n"
     printf '%s\n' "$output" | grep '^DEBUG:'
   fi
 

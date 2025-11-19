@@ -13,6 +13,5 @@ log() {
   } >> "$log_file"
 }
 
-debug() { printf 'DEBUG: %s\n' "$1"; }
-
-error() { printf 'ERROR:  %s\n' "$1" >&2; }
+debug() { printf 'DEBUG: %s\n' -- "$*" ; }
+error() { printf 'ERROR: %s\n' -- "$*" >&2; }
