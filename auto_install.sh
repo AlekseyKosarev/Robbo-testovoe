@@ -1,6 +1,7 @@
 #!/bin/bash
 . ./logging.sh
 
+
 pids=()
 tmp_files=()
 
@@ -40,6 +41,9 @@ case "${confirm,,}" in
   *) echo "Установка отменена."; exit 0;;
 esac
 #
+
+# удаление логов перед стартом
+rm -f "$log_file"
 
 # построчно читает файл - вызывает install.sh
 # передает строку из конфига

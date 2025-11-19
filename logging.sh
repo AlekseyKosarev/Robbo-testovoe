@@ -15,4 +15,4 @@ log() {
 
 debug() { printf 'DEBUG: %s\n' "$1"; }
 
-error() { printf 'ERROR: %s\n' "$1" >&2; }
+error() { printf 'ERROR:  %s\n' "$1" >&2; }
