@@ -25,7 +25,6 @@ is_installed() {
 
 download_package_wget() {
   if wget --spider --timeout=5 "$link" >/dev/null 2>&1; then
-    debug "$app_name: загружаю пакет..."
     wget --timeout=$wget_timeout "$link" -O "$app_name.deb"
     if [ $? -eq 0 ]; then
       debug "$app_name: пакет успешно загружен"
@@ -40,10 +39,9 @@ download_package_wget() {
 }
 
 install_with_apt() {
-  debug "$app_name: Проверка..."
   # если ссылка не указана - пытаемся установить через apt напрямую
   if [ -z "$link" ]; then
-    debug "$app_name: ссылка не указана, установка через apt"
+    debug "$app_name: ссылка на пакет не указана, установка через apt"
     sudo DEBIAN_FRONTEND=noninteractive apt install "$apt_flags" "$app_name"
     if [ $? -eq 0 ]; then
       debug "$app_name: пакет успешно установлен"

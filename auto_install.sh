@@ -4,6 +4,7 @@
 
 pids=()
 tmp_files=()
+app_names=()
 
 cleanup() {
   echo "Прерывание: завершаем дочерние процессы..."
@@ -32,6 +33,7 @@ fi
 
 echo "Список пакетов для установки:"
 cat -bs "$config"
+echo 
 
 # подтверждение установки y/n
 echo 'Продолжить установку? (y/N):'
@@ -55,10 +57,14 @@ while IFS= read -r line; do
   ./install.sh "$line" >"$tmp" 2>&1 &
   pids+=($!)
   tmp_files+=("$tmp")
+
+  app_names+="${line%% *}"
 done < "$config"
 
 # ждем завершения процессов, а также перехватываем обычый вывод и ошибки в лог файл! 
 for i in "${!pids[@]}"; do
+  debug "${app_names[i]}: установка начата..."
+
   tmp=${tmp_files[i]}
   wait "${pids[i]}"
   status=$?
