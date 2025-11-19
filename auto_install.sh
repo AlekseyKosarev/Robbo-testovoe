@@ -55,7 +55,7 @@ while IFS= read -r line; do
   [[ -z "$line" ]] && continue                # пропускаем пустые строки
 
   tmp=$(mktemp) || { error "Не удалось создать временный файл (mktemp failed)"; exit 1; }
-  ."$SCRIPT_DIR"/install.sh "$line" >"$tmp" 2>&1 &
+  bash "$SCRIPT_DIR"/install.sh "$line" >"$tmp" 2>&1 &
   pids+=($!)
   tmp_files+=("$tmp")
 done < "$config"
