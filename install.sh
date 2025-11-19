@@ -2,11 +2,49 @@
 # install.sh:
 # принимает один аргумент - строку из конфига 
 # формат строки - "app_name app_link(необязательно)"
-# далее проверяет, если ссылка есть - идет путем установки через dpkg
-# если только имя - идет через apt
 
 . ./logging.sh
-# Проверка прав администратора
+
+wget_timeout=10
+apt_flags=-y
+download_package_wget() {
+  if wget --spider --timeout=5 "$link" >/dev/null 2>&1; then
+    debug "-> Загружаю $app_name..."
+    wget --timeout=$wget_timeout "$link" -O "$app_name.deb"
+    if [ $? -eq 0 ]; then
+      debug "✅ $app_name: пакет успешно загружен"
+    else
+      error "$app_name: ошибка при загрузке пакета"
+      return 1
+    fi
+  else
+    error "$app_name: ссылка '$link' недоступна"
+    return 1
+  fi
+}
+
+install_with_apt() {
+  # если ссылка не указана - пытаемся установить через apt напрямую
+  if [ -z "$link" ]; then
+    debug "ссылка не указана, установка через apt"
+    sudo apt install "$apt_flags" "$app_name"
+    if [ $? -eq 0 ]; then
+      debug "✅ $app_name: пакет успешно загружен"
+    else
+      error "$app_name: ошибка при загрузке пакета"
+      return 1
+    fi
+  # если ссылка есть - скачиваем файл и устанавливаем 
+  else
+    if download_package_wget; then
+      sudo apt install "$apt_flags" "./$app_name.deb" && rm -f "$app_name.deb"
+    else
+      return 1
+    fi
+  fi
+}
+
+Проверка прав администратора
 if [ "$EUID" -ne 0 ]; then
   error "Скрипт должен быть запущен с правами администратора (root)."
   exit 1
@@ -26,22 +64,6 @@ if [ -z "$app_name" ]; then
   exit 1
 fi
 
-install_with_apt() {
-  debug "ссылка не указана, установка через apt"
-  debug "✅ $app_name: успешно установлен через apt (тест)"
-}
-
-install_with_dpkg() {
-  debug "→ Проверяю ссылку: $link"
-  if curl -I --connect-timeout 3 --max-time 5 -sf "$link" >/dev/null 2>&1; then
-    debug "✅ $app_name: ссылка доступна"
-  else
-    error "$app_name: ссылка '$link' недоступна"
-    exit 1
-  fi
-}
-if [ -z "$link" ]; then
-  install_with_apt
-else
-  install_with_dpkg
+if ! install_with_apt; then
+  exit 1
 fi

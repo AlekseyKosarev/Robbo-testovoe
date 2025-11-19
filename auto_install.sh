@@ -1,6 +1,18 @@
 #!/bin/bash
 . ./logging.sh
 
+pids=()
+tmp_files=()
+
+cleanup() {
+  echo "Прерывание: завершаем дочерние процессы..."
+  kill "${pids[@]}" 2>/dev/null
+  rm -f "${tmp_files[@]}"
+  # wait "${pids[@]}" 2>/dev/null
+  exit 1
+}
+trap cleanup INT TERM
+
 # Проверка прав администратора
 if [ "$EUID" -ne 0 ]; then
   error "Скрипт должен быть запущен с правами администратора (root)."
@@ -18,17 +30,6 @@ if [ ! -r "$config" ]; then
   exit 1
 fi
 
-pids=()
-tmp_files=()
-
-cleanup() {
-  echo "Прерывание: завершаем дочерние процессы..."
-  kill "${pids[@]}" 2>/dev/null
-  wait "${pids[@]}" 2>/dev/null
-  exit 1
-}
-trap cleanup INT TERM
-
 # построчно читает файл - вызывает install.sh
 # передает строку из конфига
 while IFS= read -r line; do
@@ -38,7 +39,7 @@ while IFS= read -r line; do
   tmp_files+=("$tmp")
 done < "$config"
 
-# ждем завершения процессов
+# ждем завершения процессов, а также перехватываем обычый вывод и ошибки в лог файл! 
 for i in "${!pids[@]}"; do
   pid=${pids[i]}
   tmp=${tmp_files[i]}

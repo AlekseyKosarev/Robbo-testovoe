@@ -1,36 +1,18 @@
 #!/bin/bash
 log_file="log_file.log" 
 
-# args - error_message(уже имеет в форматированный вывод)
+# args - сообщение об ошибке
 log() {
-  if [ "$#" -eq 0 ]; then
-    echo "Ошибка в функции log: Необходимо передать хотя бы 1 аргумент."
-    return 1
-  fi
-
-  local error_message="$1"
-  local current_time=$(date +"%Y-%m-%d %H:%M:%S")
-
+  local msg="$1" ts
+  ts=$(date +"%Y-%m-%d %H:%M:%S")
   {
-    echo "--- $current_time ---"
-    echo "$error_message"
+    printf '--- %s ---\n' "$ts"
+    printf '%s\n' "$msg"
     echo "--- ^^^^^^^^^^^^^^^^^ ---"
     echo
   } >> "$log_file"
 }
 
-debug() {
-  if [ "$#" -eq 0 ]; then
-    echo "Ошибка в функции debug: Необходимо передать хотя бы 1 аргумент."
-    return 1
-  fi
-  echo $1
-}
+debug() { printf '%s\n' "$1"; }
 
-error() {
-  if [ "$#" -eq 0 ]; then
-    echo "Ошибка в функции error: Необходимо передать хотя бы 1 аргумент."
-    return 1
-  fi
-  echo $1
-}
+error() { printf '%s\n' "$1" >&2; }
