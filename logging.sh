@@ -1,7 +1,6 @@
 #!/bin/bash
 log_file="log_file.log" 
 
-# args - сообщение об ошибке
 log() {
   local msg="$1" ts
   ts=$(date +"%Y-%m-%d %H:%M:%S")
